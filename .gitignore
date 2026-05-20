@@ -1,0 +1,5 @@
+node_modules/
+uploads/
+*.lua
+out.lua
+formatted.lua
