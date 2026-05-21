@@ -1,7 +1,8 @@
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    const RAILWAY_API = 'https://prometheus-deobf-fade.l11.store';
+    // Use the actual Railway backend URL (not the custom domain)
+    const RAILWAY_API = 'https://ironbrew2-production.up.railway.app';
 
     // Handle API requests
     if (url.pathname === '/deobfuscate' && request.method === 'POST') {
