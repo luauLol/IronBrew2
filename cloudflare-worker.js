@@ -16,7 +16,15 @@ export default {
             method: 'POST',
             body: formData
           });
-          const data = await response.json();
+          
+          const text = await response.text();
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch {
+            data = { error: text, status: response.status };
+          }
+          
           return new Response(JSON.stringify(data), {
             headers: { 'Content-Type': 'application/json' }
           });
@@ -28,7 +36,15 @@ export default {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
           });
-          const data = await response.json();
+          
+          const text = await response.text();
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch {
+            data = { error: text, status: response.status };
+          }
+          
           return new Response(JSON.stringify(data), {
             headers: { 'Content-Type': 'application/json' }
           });
