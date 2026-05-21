@@ -27,10 +27,18 @@ app.post('/deobfuscate', upload.single('file'), async (req, res) => {
         const inputPath = req.file.path;
         const outputPath = path.join('uploads', `deobfuscated_${Date.now()}.lua`);
 
-        // Import and run the deobfuscator
+        // Import and run the deobfuscator with timeout
         const { deobfuscate } = await import('./main.js');
         
-        await deobfuscate(inputPath, outputPath);
+        // Add timeout to prevent hanging
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Deobfuscation timeout - script too complex')), 120000); // 2 minute timeout
+        });
+
+        await Promise.race([
+            deobfuscate(inputPath, outputPath),
+            timeoutPromise
+        ]);
 
         // Read the deobfuscated output
         const deobfuscatedCode = await fs.readFile(outputPath, 'utf-8');
@@ -45,6 +53,12 @@ app.post('/deobfuscate', upload.single('file'), async (req, res) => {
         });
     } catch (error) {
         console.error('Deobfuscation error:', error);
+        
+        // Clean up files on error
+        if (req.file) {
+            await fs.unlink(req.file.path).catch(() => {});
+        }
+        
         res.status(500).json({ 
             error: 'Deobfuscation failed', 
             message: error.message 
